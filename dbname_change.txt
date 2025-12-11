@@ -1,4 +1,5 @@
 Oracle DB Name change from primary to prim
+The password used for the database is radhu123
 
 SQL> select name,db_unique_name,open_mode,log_mode from v$database;
 
@@ -191,4 +192,5 @@ PRIM	  PRIM				 READ WRITE
 
 SQL> 
 ======================================End==================================================
+
 
