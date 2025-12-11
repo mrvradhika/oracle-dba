@@ -1,3 +1,5 @@
+Oracle DB Name change from primary to prim
+
 SQL> select name,db_unique_name,open_mode,log_mode from v$database;
 
 NAME	  DB_UNIQUE_NAME		 OPEN_MODE	      LOG_MODE
@@ -188,4 +190,5 @@ NAME	  DB_UNIQUE_NAME		 OPEN_MODE
 PRIM	  PRIM				 READ WRITE
 
 SQL> 
+======================================End==================================================
 
