@@ -1,0 +1,191 @@
+SQL> select name,db_unique_name,open_mode,log_mode from v$database;
+
+NAME	  DB_UNIQUE_NAME		 OPEN_MODE	      LOG_MODE
+--------- ------------------------------ -------------------- ------------
+PRIMARY   primary			 READ WRITE	      NOARCHIVELOG
+
+SQL> shutdown immediate;
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+SQL> startup mount;
+ORACLE instance started.
+
+Total System Global Area 1795159104 bytes
+Fixed Size		    8897600 bytes
+Variable Size		  419430400 bytes
+Database Buffers	 1358954496 bytes
+Redo Buffers		    7876608 bytes
+Database mounted.
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.8.0.0.0
+[oracle@srv1 ~]$ 
+
+==========================================================================================
+
+Change the dbname from primary to prim
+======================================
+
+[oracle@srv1 ~]$ nid target=sys/radhu123@primary dbname=prim
+
+DBNEWID: Release 19.0.0.0.0 - Production on Thu Dec 11 15:52:28 2025
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+
+Connected to database PRIMARY (DBID=2057068744)
+
+Connected to server version 19.8.0
+
+Control Files in database:
+    /u01/app/oracle/oradata/PRIMARY/controlfile/o1_mf_nmo568d2_.ctl
+    /u01/app/oracle/fast_recovery_area/PRIMARY/controlfile/o1_mf_nmo568jw_.ctl
+
+Change database ID and database name PRIMARY to PRIM? (Y/[N]) => Y
+
+Proceeding with operation
+Changing database ID from 2057068744 to 216917245
+Changing database name from PRIMARY to PRIM
+    Control File /u01/app/oracle/oradata/PRIMARY/controlfile/o1_mf_nmo568d2_.ctl - modified
+    Control File /u01/app/oracle/fast_recovery_area/PRIMARY/controlfile/o1_mf_nmo568jw_.ctl - modified
+    Datafile /u01/app/oracle/oradata/PRIMARY/datafile/o1_mf_system_nmo53brw_.db - dbid changed, wrote new name
+    Datafile /u01/app/oracle/oradata/PRIMARY/datafile/o1_mf_sysaux_nmo54gor_.db - dbid changed, wrote new name
+    Datafile /u01/app/oracle/oradata/PRIMARY/datafile/o1_mf_undotbs1_nmo54yh7_.db - dbid changed, wrote new name
+    Datafile /u01/app/oracle/oradata/PRIMARY/datafile/o1_mf_users_nmo54zp5_.db - dbid changed, wrote new name
+    Datafile /u01/app/oracle/oradata/PRIMARY/datafile/o1_mf_temp_nmo5717o_.tm - dbid changed, wrote new name
+    Control File /u01/app/oracle/oradata/PRIMARY/controlfile/o1_mf_nmo568d2_.ctl - dbid changed, wrote new name
+    Control File /u01/app/oracle/fast_recovery_area/PRIMARY/controlfile/o1_mf_nmo568jw_.ctl - dbid changed, wrote new name
+    Instance shut down
+
+Database name changed to PRIM.
+Modify parameter file and generate a new password file before restarting.
+Database ID for database PRIM changed to 216917245.
+All previous backups and archived redo logs for this database are unusable.
+Database is not aware of previous backups and archived logs in Recovery Area.
+Database has been shutdown, open database with RESETLOGS option.
+Succesfully changed database name and ID.
+DBNEWID - Completed succesfully.
+
+[oracle@srv1 ~]$ 
+
+======================================================================================
+
+[oracle@srv1 ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Thu Dec 11 15:53:54 2025
+Version 19.8.0.0.0
+
+Copyright (c) 1982, 2020, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup nomount;
+ORACLE instance started.
+
+Total System Global Area 1795159104 bytes
+Fixed Size		    8897600 bytes
+Variable Size		  419430400 bytes
+Database Buffers	 1358954496 bytes
+Redo Buffers		    7876608 bytes
+SQL> show parameter db_name;
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+db_name 			     string	 primary
+SQL> alter system set db_name=prim scope=spfile;
+
+System altered.
+
+SQL> show parameter db_name;
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+db_name 			     string	 primary
+SQL> shut immediate;
+ORA-01507: database not mounted
+
+
+ORACLE instance shut down.
+SQL> startup nomount;
+ORACLE instance started.
+
+Total System Global Area 1795159104 bytes
+Fixed Size		    8897600 bytes
+Variable Size		  419430400 bytes
+Database Buffers	 1358954496 bytes
+Redo Buffers		    7876608 bytes
+SQL> show parameter db_name;
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+db_name 			     string	 PRIM
+SQL> shut immediate;
+ORA-01507: database not mounted
+
+
+ORACLE instance shut down.
+SQL> 
+
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.8.0.0.0
+
+=======================================================================================
+
+[oracle@srv1 ~]$ cd $ORACLE_HOME/dbs
+[oracle@srv1 dbs]$ ls -ltr
+total 24
+-rw-r--r--. 1 oracle oinstall 3079 May 14  2015 init.ora
+-rw-rw----. 1 oracle oinstall 1544 Dec 11 13:51 hc_oradb.dat
+-rw-r-----. 1 oracle oinstall   24 Dec 11 13:52 lkPRIMARY
+-rw-r-----. 1 oracle oinstall 2048 Dec 11 13:54 orapwprimary
+-rw-r-----. 1 oracle oinstall 3584 Dec 11 15:55 spfileprimary.ora
+-rw-rw----. 1 oracle oinstall 1544 Dec 11 15:57 hc_primary.dat
+[oracle@srv1 dbs]$ cp spfileprimary.ora spfileprim.ora
+[oracle@srv1 dbs]$ export ORACLE_SID=prim
+[oracle@srv1 dbs]$ echo $ORACLE_SID
+prim
+[oracle@srv1 dbs]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Thu Dec 11 16:00:13 2025
+Version 19.8.0.0.0
+
+Copyright (c) 1982, 2020, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup nomount;
+ORACLE instance started.
+
+Total System Global Area 1795159104 bytes
+Fixed Size		    8897600 bytes
+Variable Size		  419430400 bytes
+Database Buffers	 1358954496 bytes
+Redo Buffers		    7876608 bytes
+SQL> alter database mount;
+
+Database altered.
+
+SQL> alter database open resetlogs;
+
+Database altered.
+
+SQL> show parameter listener
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+forward_listener		     string
+listener_networks		     string
+local_listener			     string	 LISTENER_PRIMARY
+remote_listener 		     string
+SQL> alter system register;
+
+System altered.
+
+SQL> select name,db_unique_name,open_mode from v$database;
+
+NAME	  DB_UNIQUE_NAME		 OPEN_MODE
+--------- ------------------------------ --------------------
+PRIM	  PRIM				 READ WRITE
+
+SQL> 
+
